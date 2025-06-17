@@ -47,49 +47,97 @@ function displayResults(spells) {
     resultsDiv.innerHTML = '';
 
     if (spells.length === 0) {
-        resultsDiv.innerHTML = '<p class="text-center text-gray-600">No spells found.</p>';
+        resultsDiv.innerHTML = '<p class="text-center text-gray-600 py-4">No spells found matching your criteria.</p>';
         return;
     }
 
     spells.forEach((spell, index) => {
         let spellCard = document.createElement('div');
-        spellCard.className = 'p-4 border rounded bg-gray-50 mb-4';
+        spellCard.className = 'p-6 border rounded-lg bg-white shadow-md mb-6 spell-card';
+
+        // Format components with icons if available
+        let componentsHTML = '';
+        if (spell.Components) {
+            const comps = spell.Components.split(',').map(c => c.trim());
+            componentsHTML = comps.map(c => {
+                const icon = {
+                    'V': '🗣️',
+                    'S': '👐',
+                    'M': '💎'
+                }[c] || c;
+                return `<span class="component-pill bg-gray-100 px-2 py-1 rounded mr-2">${icon} ${c}</span>`;
+            }).join('');
+        }
 
         spellCard.innerHTML = `
-            <h2 class="font-bold text-xl mb-2">${spell['Spell Name']}</h2>
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div class="flex justify-between items-start mb-4">
                 <div>
-                    <p class="font-semibold">Level</p>
-                    <p>${spell.Level === 0 ? 'Cantrip' : `Level ${spell.Level}`}</p>
+                    <h2 class="text-2xl font-bold text-gray-800">${spell['Spell Name']}</h2>
+                    <div class="flex items-center mt-1">
+                        <span class="level-badge px-3 py-1 rounded-full 
+                            ${spell.Level === 0 ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'} 
+                            text-sm font-semibold">
+                            ${spell.Level === 0 ? 'Cantrip' : `Level ${spell.Level}`}
+                        </span>
+                        <span class="school-badge ml-2 px-3 py-1 bg-${getSchoolColor(spell.School)}-100 
+                            text-${getSchoolColor(spell.School)}-800 rounded-full text-sm font-semibold">
+                            ${spell.School}
+                        </span>
+                    </div>
                 </div>
-                <div>
-                    <p class="font-semibold">School</p>
-                    <p>${spell.School}</p>
+                <div class="text-sm text-gray-500">${index + 1}/${spells.length}</div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+                <div class="spell-stat">
+                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Casting Time</h3>
+                    <p class="text-lg">${spell['Casting Time'] || '—'}</p>
                 </div>
-                <div>
-                    <p class="font-semibold">Classes</p>
-                    <p>${spell.Class}</p>
+                <div class="spell-stat">
+                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Range</h3>
+                    <p class="text-lg">${spell.Range || '—'}</p>
                 </div>
-                <div>
-                    <p class="font-semibold">Casting Time</p>
-                    <p>${spell['Casting Time'] || 'N/A'}</p>
-                </div>
-                <div>
-                    <p class="font-semibold">Range</p>
-                    <p>${spell.Range || 'N/A'}</p>
-                </div>
-                <div>
-                    <p class="font-semibold">Duration</p>
-                    <p>${spell.Duration || 'N/A'}</p>
-                </div>
-                <div>
-                    <p class="font-semibold">Components</p>
-                    <p>${spell.Components || 'N/A'}</p>
+                <div class="spell-stat">
+                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Duration</h3>
+                    <p class="text-lg">${spell.Duration || '—'}</p>
                 </div>
             </div>
-            ${spell.Description ? `<div class="mt-3"><p class="font-semibold">Description</p><p>${spell.Description}</p></div>` : ''}
+
+            <div class="mb-4">
+                <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">Components</h3>
+                <div class="flex flex-wrap gap-2">${componentsHTML}</div>
+                ${spell['Material Components'] ? 
+                    `<p class="text-sm text-gray-600 mt-2"><em>${spell['Material Components']}</em></p>` : ''}
+            </div>
+
+            <div class="mb-4">
+                <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Available To</h3>
+                <p class="text-lg">${spell.Class}</p>
+            </div>
+
+            ${spell.Description ? `
+            <div class="spell-description mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">Description</h3>
+                <p class="whitespace-pre-line">${spell.Description}</p>
+            </div>
+            ` : ''}
         `;
 
         resultsDiv.appendChild(spellCard);
     });
+}
+
+// Helper function for school colors
+function getSchoolColor(school) {
+    const schoolColors = {
+        'Abjuration': 'blue',
+        'Conjuration': 'teal',
+        'Divination': 'indigo',
+        'Enchantment': 'pink',
+        'Evocation': 'red',
+        'Illusion': 'purple',
+        'Necromancy': 'green',
+        'Transmutation': 'yellow'
+    };
+    return schoolColors[school] || 'gray';
 }

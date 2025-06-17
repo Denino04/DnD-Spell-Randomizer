@@ -1,126 +1,67 @@
-// Main spell fetching function
 function fetchSpells() {
-    // Get user inputs
-    const inputs = {
-        characterClass: document.getElementById('characterClass').value.trim().toLowerCase(),
-        classLevel: parseInt(document.getElementById('classLevel').value),
-        numberOfSpells: parseInt(document.getElementById('numberOfSpells').value),
-        schools: document.getElementById('schools').value.split(',').map(s => s.trim().toLowerCase())
-    };
+    const characterClass = document.getElementById('characterClass').value.trim().toLowerCase();
+    const classLevel = parseInt(document.getElementById('classLevel').value);
+    const numberOfSpells = parseInt(document.getElementById('numberOfSpells').value);
+    const schools = document.getElementById('schools').value.split(',').map(s => s.trim().toLowerCase());
 
-    // Process available spells
-    const availableSpells = processSpells(spells, inputs);
+    let availableSpells = spells
+        .map(spell => {
+            let levelStr = String(spell.Level).trim().toLowerCase();
+            let parsedLevel = levelStr === 'cantrip' ? 0 : parseInt(levelStr) || 0;
+            return { ...spell, ParsedLevel: parsedLevel };
+        })
+        .filter(spell => spell.ParsedLevel <= classLevel && spell.Class.toLowerCase().includes(characterClass));
 
-    // Select spells based on user preferences
-    const selectedSpells = selectSpells(availableSpells, inputs);
+    let selectedSpells = [];
 
-    // Display results
-    displayResults(selectedSpells);
-}
-
-// Process and filter spells based on user inputs
-function processSpells(spells, inputs) {
-    return spells.map(spell => {
-        const parsedLevel = spell.Level === 'Cantrip' ? 0 : parseInt(spell.Level) || 0;
-        return { ...spell, parsedLevel };
-    }).filter(spell => 
-        spell.parsedLevel <= inputs.classLevel && 
-        spell.Class.toLowerCase().includes(inputs.characterClass)
-    );
-}
-
-// Select spells using weighted randomization
-function selectSpells(availableSpells, inputs) {
-    const selectedSpells = [];
-    
-    for (let i = 0; i < inputs.numberOfSpells; i++) {
-        const school = inputs.schools[i % inputs.schools.length];
-        const schoolSpells = availableSpells.filter(s => 
-            s.School.toLowerCase() === school
-        );
+    for (let i = 0; i < numberOfSpells; i++) {
+        let school = schools[i % schools.length];
+        let schoolSpells = availableSpells.filter(s => s.School.toLowerCase() === school);
 
         if (schoolSpells.length === 0) {
-            console.warn(`No spells found for school: ${school}`);
+            console.log(`No spells found for school: ${school}`);
             continue;
         }
 
-        const weightedSpell = selectWeightedSpell(schoolSpells);
-        selectedSpells.push(weightedSpell);
-    }
+        let weights = schoolSpells.map(s => Math.pow(s.ParsedLevel + 1, 2));
+        let totalWeight = weights.reduce((a, b) => a + b, 0);
+        let randomValue = Math.random() * totalWeight;
 
-    return selectedSpells;
-}
-
-// Weighted random selection helper
-function selectWeightedSpell(spells) {
-    const weights = spells.map(s => Math.pow(s.parsedLevel + 1, 2));
-    const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
-    let randomValue = Math.random() * totalWeight;
-
-    for (let i = 0; i < weights.length; i++) {
-        if (randomValue < weights[i]) {
-            return spells[i];
+        let chosenIndex = 0;
+        for (let w = 0; w < weights.length; w++) {
+            if (randomValue < weights[w]) {
+                chosenIndex = w;
+                break;
+            }
+            randomValue -= weights[w];
         }
-        randomValue -= weights[i];
+
+        selectedSpells.push(schoolSpells[chosenIndex]);
     }
 
-    return spells[0]; // Fallback
+    displayResults(selectedSpells);
 }
 
-// Display results in clean format
 function displayResults(spells) {
     const resultsDiv = document.getElementById('results');
-    resultsDiv.innerHTML = spells.length ? '' : '<p>No spells found matching your criteria.</p>';
+    resultsDiv.innerHTML = '';
+
+    if (spells.length === 0) {
+        resultsDiv.innerHTML = '<p class="text-center text-gray-600">No spells found.</p>';
+        return;
+    }
 
     spells.forEach((spell, index) => {
-        resultsDiv.appendChild(createSpellCard(spell, index, spells.length));
+        let spellCard = document.createElement('div');
+        spellCard.className = 'p-4 border rounded bg-gray-50';
+
+        spellCard.innerHTML = `
+            <h2 class="font-bold mb-2">Spell ${index + 1}: ${spell['Spell Name']}</h2>
+            <p><strong>Level:</strong> ${spell.Level}</p>
+            <p><strong>School:</strong> ${spell.School}</p>
+            <p><strong>Classes:</strong> ${spell.Class}</p>
+        `;
+
+        resultsDiv.appendChild(spellCard);
     });
-}
-
-// Create individual spell card
-function createSpellCard(spell, index, total) {
-    const card = document.createElement('div');
-    card.className = 'spell-card';
-    
-    card.innerHTML = `
-        <h2>${spell['Spell Name']}</h2>
-        <div class="spell-meta">
-            <span>Level: ${spell.Level === 0 ? 'Cantrip' : spell.Level}</span>
-            <span>School: ${spell.School}</span>
-            <span>${index + 1}/${total}</span>
-        </div>
-        
-        <ul class="spell-details">
-            <li><strong>Casting Time:</strong> ${spell['Casting Time'] || '-'}</li>
-            <li><strong>Range:</strong> ${spell.Range || '-'}</li>
-            <li><strong>Duration:</strong> ${spell.Duration || '-'}</li>
-            <li><strong>Components:</strong> ${formatComponents(spell.Components)}</li>
-            <li><strong>Classes:</strong> ${spell.Class}</li>
-        </ul>
-        
-        ${spell.Description ? `
-        <div class="spell-description">
-            <h3>Description</h3>
-            <p>${spell.Description}</p>
-        </div>
-        ` : ''}
-    `;
-    
-    return card;
-}
-
-// Format spell components with icons
-function formatComponents(components) {
-    if (!components) return '-';
-    
-    const icons = {
-        'V': '🗣️',
-        'S': '👐',
-        'M': '💎'
-    };
-    
-    return components.split(',').map(c => {
-        const component = c.trim();
-        return `${icons[component] || ''} ${component}`;
-    }).join(', ');
 }

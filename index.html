@@ -88,6 +88,8 @@
                                     <option value="paladin">Paladin</option>
                                     <option value="ranger">Ranger</option>
                                     <option value="artificer">Artificer</option>
+                                    <option value="eldritch knight">Eldritch Knight</option>
+                                    <option value="arcane trickster">Arcane Trickster</option>
                                 </select>
                             </div>
                             
@@ -264,9 +266,175 @@
         </div>
     </footer>
 
-    <script src="spells.js"></script>
-    <script src="app.js"></script>
     <script>
+        // Sample spells data - in a real app this would be in spells.js
+        const spells = [
+            {
+                "Spell Name": "Magic Missile",
+                "School": "Evocation",
+                "Casting Time": "1 action",
+                "Range": "120 feet",
+                "Duration": "Instantaneous",
+                "Components": "V, S",
+                "Level": 1,
+                "Class": "Wizard, Sorcerer, Eldritch Knight, Arcane Trickster",
+                "Description": "You create three glowing darts of magical force..."
+            },
+            {
+                "Spell Name": "Shield",
+                "School": "Abjuration",
+                "Casting Time": "1 reaction",
+                "Range": "Self",
+                "Duration": "1 round",
+                "Components": "V, S",
+                "Level": 1,
+                "Class": "Wizard, Sorcerer, Eldritch Knight",
+                "Description": "An invisible barrier of magical force appears..."
+            },
+            {
+                "Spell Name": "Disguise Self",
+                "School": "Illusion",
+                "Casting Time": "1 action",
+                "Range": "Self",
+                "Duration": "1 hour",
+                "Components": "V, S",
+                "Level": 1,
+                "Class": "Bard, Sorcerer, Wizard, Arcane Trickster",
+                "Description": "You make yourself appear different..."
+            },
+            {
+                "Spell Name": "Fireball",
+                "School": "Evocation",
+                "Casting Time": "1 action",
+                "Range": "150 feet",
+                "Duration": "Instantaneous",
+                "Components": "V, S, M",
+                "Level": 3,
+                "Class": "Wizard, Sorcerer",
+                "Description": "A bright streak flashes from your pointing finger..."
+            },
+            {
+                "Spell Name": "Mage Hand",
+                "School": "Conjuration",
+                "Casting Time": "1 action",
+                "Range": "30 feet",
+                "Duration": "1 minute",
+                "Components": "V, S",
+                "Level": 0,
+                "Class": "Bard, Sorcerer, Warlock, Wizard, Arcane Trickster",
+                "Description": "A spectral, floating hand appears at a point you choose..."
+            }
+        ];
+
+        function fetchSpells() {
+            // Get user inputs
+            const characterClass = document.getElementById('characterClass').value.toLowerCase();
+            const classLevel = parseInt(document.getElementById('classLevel').value);
+            const numberOfSpells = parseInt(document.getElementById('numberOfSpells').value);
+            
+            // Get selected schools
+            const schoolCheckboxes = document.querySelectorAll('input[name="school"]:checked');
+            const schools = Array.from(schoolCheckboxes).map(cb => cb.value.toLowerCase());
+            
+            if (!characterClass || isNaN(classLevel) || isNaN(numberOfSpells) || schools.length === 0) {
+                alert("Please fill all fields and select at least one school");
+                return;
+            }
+
+            // Filter available spells
+            let availableSpells = spells.filter(spell => {
+                const spellLevel = spell.Level || 0;
+                const spellClasses = spell.Class.toLowerCase().split(', ');
+                return spellLevel <= classLevel && 
+                       spellClasses.some(c => c.includes(characterClass)) &&
+                       schools.includes(spell.School.toLowerCase());
+            });
+
+            if (availableSpells.length === 0) {
+                document.getElementById('results').innerHTML = `
+                    <div class="col-span-2 bg-red-100 border-l-4 border-red-500 text-red-700 p-4">
+                        <p>No spells found matching your criteria. Try different options.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Select random spells
+            let selectedSpells = [];
+            for (let i = 0; i < numberOfSpells && availableSpells.length > 0; i++) {
+                const randomIndex = Math.floor(Math.random() * availableSpells.length);
+                selectedSpells.push(availableSpells[randomIndex]);
+                availableSpells.splice(randomIndex, 1); // Avoid duplicates
+            }
+
+            displayResults(selectedSpells);
+        }
+
+        function displayResults(spells) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '';
+
+            if (spells.length === 0) {
+                resultsDiv.innerHTML = '<p class="text-center text-gray-600">No spells found matching your criteria.</p>';
+                return;
+            }
+
+            spells.forEach((spell, index) => {
+                const spellCard = document.createElement('div');
+                spellCard.className = 'spell-card bg-white rounded-lg shadow-md overflow-hidden';
+                
+                spellCard.innerHTML = `
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <h2 class="text-xl font-bold text-gray-800">${spell['Spell Name']}</h2>
+                            <span class="px-3 py-1 rounded-full text-sm font-semibold 
+                                ${spell.Level === 0 ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}">
+                                ${spell.Level === 0 ? 'Cantrip' : `Level ${spell.Level}`}
+                            </span>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <h3 class="text-sm font-semibold text-gray-500 uppercase">School</h3>
+                                <p>${spell.School}</p>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-semibold text-gray-500 uppercase">Casting Time</h3>
+                                <p>${spell['Casting Time']}</p>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-semibold text-gray-500 uppercase">Range</h3>
+                                <p>${spell.Range}</p>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-semibold text-gray-500 uppercase">Duration</h3>
+                                <p>${spell.Duration}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h3 class="text-sm font-semibold text-gray-500 uppercase">Components</h3>
+                            <p>${spell.Components}</p>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h3 class="text-sm font-semibold text-gray-500 uppercase">Classes</h3>
+                            <p>${spell.Class}</p>
+                        </div>
+                        
+                        ${spell.Description ? `
+                        <div class="bg-gray-50 p-4 rounded border border-gray-200">
+                            <h3 class="text-sm font-semibold text-gray-500 uppercase mb-2">Description</h3>
+                            <p class="text-gray-700">${spell.Description}</p>
+                        </div>
+                        ` : ''}
+                    </div>
+                `;
+                
+                resultsDiv.appendChild(spellCard);
+            });
+        }
+
         // Update spell count display
         const spellCountSlider = document.getElementById('numberOfSpells');
         const spellCountDisplay = document.getElementById('spellCountDisplay');

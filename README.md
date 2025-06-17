@@ -4,6 +4,8 @@
 
 A web application that helps Dungeons & Dragons players randomly select spells for their characters based on class, level, and preferred magic schools.
 
+Live Demo: https://denino04.github.io/DnD-Spell-Randomizer/
+
 ## Features
 
 - **Class-based Spell Selection**: Filter spells by character class (Wizard, Sorcerer, Cleric, etc.)

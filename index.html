@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spell Randomizer</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.0/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+
+    <div class="max-w-2xl w-full bg-white p-6 rounded-xl shadow-lg">
+        <h1 class="text-2xl font-bold mb-4 text-center">D&D Spell Randomizer</h1>
+
+        <div class="space-y-4">
+            <div>
+                <label class="block font-medium">Character Class:</label>
+                <input id="characterClass" type="text" class="w-full border p-2 rounded" placeholder="e.g. Wizard">
+            </div>
+
+            <div>
+                <label class="block font-medium">Class Level (max spell level):</label>
+                <input id="classLevel" type="number" class="w-full border p-2 rounded" placeholder="e.g. 4">
+            </div>
+
+            <div>
+                <label class="block font-medium">Number of Spells:</label>
+                <input id="numberOfSpells" type="number" class="w-full border p-2 rounded" placeholder="e.g. 5">
+            </div>
+
+            <div>
+                <label class="block font-medium">Schools (comma separated):</label>
+                <input id="schools" type="text" class="w-full border p-2 rounded" placeholder="e.g. Evocation, Necromancy">
+            </div>
+
+            <button onclick="fetchSpells()" class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition">Fetch Random Spells</button>
+        </div>
+
+        <div id="results" class="mt-6 space-y-4"></div>
+    </div>
+
+    <script src="spells.js"></script>
+    <script src="app.js"></script>
+
+</body>
+</html>

@@ -53,13 +53,41 @@ function displayResults(spells) {
 
     spells.forEach((spell, index) => {
         let spellCard = document.createElement('div');
-        spellCard.className = 'p-4 border rounded bg-gray-50';
+        spellCard.className = 'p-4 border rounded bg-gray-50 mb-4';
 
         spellCard.innerHTML = `
-            <h2 class="font-bold mb-2">Spell ${index + 1}: ${spell['Spell Name']}</h2>
-            <p><strong>Level:</strong> ${spell.Level}</p>
-            <p><strong>School:</strong> ${spell.School}</p>
-            <p><strong>Classes:</strong> ${spell.Class}</p>
+            <h2 class="font-bold text-xl mb-2">${spell['Spell Name']}</h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div>
+                    <p class="font-semibold">Level</p>
+                    <p>${spell.Level === 0 ? 'Cantrip' : `Level ${spell.Level}`}</p>
+                </div>
+                <div>
+                    <p class="font-semibold">School</p>
+                    <p>${spell.School}</p>
+                </div>
+                <div>
+                    <p class="font-semibold">Classes</p>
+                    <p>${spell.Class}</p>
+                </div>
+                <div>
+                    <p class="font-semibold">Casting Time</p>
+                    <p>${spell['Casting Time'] || 'N/A'}</p>
+                </div>
+                <div>
+                    <p class="font-semibold">Range</p>
+                    <p>${spell.Range || 'N/A'}</p>
+                </div>
+                <div>
+                    <p class="font-semibold">Duration</p>
+                    <p>${spell.Duration || 'N/A'}</p>
+                </div>
+                <div>
+                    <p class="font-semibold">Components</p>
+                    <p>${spell.Components || 'N/A'}</p>
+                </div>
+            </div>
+            ${spell.Description ? `<div class="mt-3"><p class="font-semibold">Description</p><p>${spell.Description}</p></div>` : ''}
         `;
 
         resultsDiv.appendChild(spellCard);

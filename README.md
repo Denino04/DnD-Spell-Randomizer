@@ -1,7 +1,5 @@
 # DnD-Spell-Randomizer
 
-# D&D Spell Randomizer
-
 ![D&D Logo](https://img.icons8.com/color/96/000000/dungeons-and-dragons.png)
 
 A web application that helps Dungeons & Dragons players randomly select spells for their characters based on class, level, and preferred magic schools.
@@ -17,7 +15,6 @@ A web application that helps Dungeons & Dragons players randomly select spells f
   - Range
   - Duration
   - Components
-  - Description (when available)
 
 ## How It Works
 

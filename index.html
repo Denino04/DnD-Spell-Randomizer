@@ -3,43 +3,277 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spell Randomizer</title>
+    <meta name="description" content="Random spell generator for Dungeons & Dragons 5th Edition">
+    <title>D&D 5e Spell Randomizer | Generate Random Spells for Your Character</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.0/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .school-evocation { background-color: #fecaca; }
+        .school-abjuration { background-color: #bfdbfe; }
+        .school-conjuration { background-color: #a7f3d0; }
+        .school-divination { background-color: #ddd6fe; }
+        .school-enchantment { background-color: #fbcfe8; }
+        .school-illusion { background-color: #e9d5ff; }
+        .school-necromancy { background-color: #86efac; }
+        .school-transmutation { background-color: #fef08a; }
+        
+        .nav-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .spell-card {
+            transition: all 0.3s ease;
+        }
+        
+        .spell-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+    </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
 
-    <div class="max-w-2xl w-full bg-white p-6 rounded-xl shadow-lg">
-        <h1 class="text-2xl font-bold mb-4 text-center">D&D Spell Randomizer</h1>
-
-        <div class="space-y-4">
-            <div>
-                <label class="block font-medium">Character Class:</label>
-                <input id="characterClass" type="text" class="w-full border p-2 rounded" placeholder="e.g. Wizard">
+<body class="bg-gray-50 font-sans">
+    <!-- Navigation -->
+    <nav class="bg-gray-900 text-white shadow-lg">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-hat-wizard text-2xl text-purple-400"></i>
+                <span class="text-xl font-bold">D&D Spell Randomizer</span>
             </div>
-
-            <div>
-                <label class="block font-medium">Class Level (max spell level):</label>
-                <input id="classLevel" type="number" class="w-full border p-2 rounded" placeholder="e.g. 4">
+            <div class="hidden md:flex space-x-6">
+                <a href="#generator" class="nav-link px-3 py-2 rounded-lg bg-gray-800 hover:bg-purple-700 transition">Generator</a>
+                <a href="#how-it-works" class="nav-link px-3 py-2 rounded-lg hover:bg-gray-800 transition">How It Works</a>
+                <a href="#spell-schools" class="nav-link px-3 py-2 rounded-lg hover:bg-gray-800 transition">Spell Schools</a>
             </div>
-
-            <div>
-                <label class="block font-medium">Number of Spells:</label>
-                <input id="numberOfSpells" type="number" class="w-full border p-2 rounded" placeholder="e.g. 5">
-            </div>
-
-            <div>
-                <label class="block font-medium">Schools (comma separated):</label>
-                <input id="schools" type="text" class="w-full border p-2 rounded" placeholder="e.g. Evocation, Necromancy">
-            </div>
-
-            <button onclick="fetchSpells()" class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition">Fetch Random Spells</button>
+            <button class="md:hidden text-2xl focus:outline-none">
+                <i class="fas fa-bars"></i>
+            </button>
         </div>
+    </nav>
 
-        <div id="results" class="mt-6 space-y-4"></div>
-    </div>
+    <!-- Hero Section -->
+    <header class="bg-gradient-to-r from-purple-900 to-blue-900 text-white py-16">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">D&D 5e Spell Randomizer</h1>
+            <p class="text-xl md:text-2xl mb-8 max-w-2xl mx-auto">Generate perfectly balanced random spells for your D&D character</p>
+            <a href="#generator" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-full text-lg transition inline-block">
+                Try It Now <i class="fas fa-arrow-down ml-2"></i>
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-12">
+        <!-- Generator Section -->
+        <section id="generator" class="mb-20">
+            <div class="max-w-3xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="bg-gray-800 text-white px-6 py-4">
+                    <h2 class="text-2xl font-bold"><i class="fas fa-magic mr-2"></i> Spell Generator</h2>
+                </div>
+                
+                <div class="p-6">
+                    <form id="spellForm" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="characterClass" class="block text-lg font-medium text-gray-700 mb-2">Character Class</label>
+                                <select id="characterClass" class="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                    <option value="">Select a class</option>
+                                    <option value="wizard">Wizard</option>
+                                    <option value="sorcerer">Sorcerer</option>
+                                    <option value="cleric">Cleric</option>
+                                    <option value="druid">Druid</option>
+                                    <option value="bard">Bard</option>
+                                    <option value="warlock">Warlock</option>
+                                    <option value="paladin">Paladin</option>
+                                    <option value="ranger">Ranger</option>
+                                    <option value="artificer">Artificer</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label for="classLevel" class="block text-lg font-medium text-gray-700 mb-2">Character Level</label>
+                                <input type="number" id="classLevel" min="1" max="20" 
+                                       class="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-purple-500" 
+                                       placeholder="1-20" required>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label for="numberOfSpells" class="block text-lg font-medium text-gray-700 mb-2">Number of Spells</label>
+                            <input type="range" id="numberOfSpells" min="1" max="10" value="5" 
+                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                            <div class="flex justify-between text-gray-600 mt-1">
+                                <span>1</span>
+                                <span id="spellCountDisplay">5</span>
+                                <span>10</span>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-lg font-medium text-gray-700 mb-3">Spell Schools</label>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" name="school" value="abjuration" checked class="rounded text-purple-600">
+                                    <span>Abjuration</span>
+                                </label>
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" name="school" value="conjuration" checked class="rounded text-purple-600">
+                                    <span>Conjuration</span>
+                                </label>
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" name="school" value="divination" checked class="rounded text-purple-600">
+                                    <span>Divination</span>
+                                </label>
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" name="school" value="enchantment" checked class="rounded text-purple-600">
+                                    <span>Enchantment</span>
+                                </label>
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" name="school" value="evocation" checked class="rounded text-purple-600">
+                                    <span>Evocation</span>
+                                </label>
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" name="school" value="illusion" checked class="rounded text-purple-600">
+                                    <span>Illusion</span>
+                                </label>
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" name="school" value="necromancy" checked class="rounded text-purple-600">
+                                    <span>Necromancy</span>
+                                </label>
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" name="school" value="transmutation" checked class="rounded text-purple-600">
+                                    <span>Transmutation</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <button type="button" onclick="fetchSpells()" 
+                                class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-lg text-lg transition flex items-center justify-center space-x-2">
+                            <i class="fas fa-wand-sparkles"></i>
+                            <span>Generate Spells</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div id="results" class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+        </section>
+        
+        <!-- How It Works Section -->
+        <section id="how-it-works" class="mb-20">
+            <h2 class="text-3xl font-bold text-center mb-12">How It Works</h2>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-md text-center">
+                    <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-user text-purple-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Choose Your Class</h3>
+                    <p class="text-gray-600">Select your character's class to see only spells available to you.</p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-md text-center">
+                    <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-sliders-h text-purple-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Set Preferences</h3>
+                    <p class="text-gray-600">Adjust level range, number of spells, and preferred magic schools.</p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-md text-center">
+                    <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-random text-purple-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Get Random Spells</h3>
+                    <p class="text-gray-600">Receive a balanced selection of spells based on your criteria.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Spell Schools Section -->
+        <section id="spell-schools" class="mb-20">
+            <h2 class="text-3xl font-bold text-center mb-12">Spell Schools</h2>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="school-abjuration p-6 rounded-xl text-white">
+                    <h3 class="text-xl font-bold mb-2">Abjuration</h3>
+                    <p>Protective magic that blocks, banishes, or shields.</p>
+                </div>
+                <div class="school-conjuration p-6 rounded-xl text-white">
+                    <h3 class="text-xl font-bold mb-2">Conjuration</h3>
+                    <p>Magic that transports creatures or objects.</p>
+                </div>
+                <div class="school-divination p-6 rounded-xl text-white">
+                    <h3 class="text-xl font-bold mb-2">Divination</h3>
+                    <p>Magic that reveals information.</p>
+                </div>
+                <div class="school-enchantment p-6 rounded-xl text-white">
+                    <h3 class="text-xl font-bold mb-2">Enchantment</h3>
+                    <p>Magic that affects minds and emotions.</p>
+                </div>
+                <div class="school-evocation p-6 rounded-xl text-white">
+                    <h3 class="text-xl font-bold mb-2">Evocation</h3>
+                    <p>Magic that manipulates energy or creates something from nothing.</p>
+                </div>
+                <div class="school-illusion p-6 rounded-xl text-white">
+                    <h3 class="text-xl font-bold mb-2">Illusion</h3>
+                    <p>Magic that deceives senses or minds.</p>
+                </div>
+                <div class="school-necromancy p-6 rounded-xl text-white">
+                    <h3 class="text-xl font-bold mb-2">Necromancy</h3>
+                    <p>Magic that manipulates life force and death.</p>
+                </div>
+                <div class="school-transmutation p-6 rounded-xl text-white">
+                    <h3 class="text-xl font-bold mb-2">Transmutation</h3>
+                    <p>Magic that changes the properties of creatures or objects.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-6 md:mb-0">
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-hat-wizard text-2xl text-purple-400"></i>
+                        <span class="text-xl font-bold">D&D Spell Randomizer</span>
+                    </div>
+                    <p class="mt-2 text-gray-400">Not affiliated with Wizards of the Coast</p>
+                </div>
+                
+                <div class="flex space-x-6">
+                    <a href="#" class="text-gray-400 hover:text-white transition">
+                        <i class="fab fa-github text-2xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition">
+                        <i class="fab fa-twitter text-2xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition">
+                        <i class="fas fa-envelope text-2xl"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>All Dungeons & Dragons content is property of Wizards of the Coast.</p>
+                <p class="mt-2">© 2023 D&D Spell Randomizer. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
 
     <script src="spells.js"></script>
     <script src="app.js"></script>
-
+    <script>
+        // Update spell count display
+        const spellCountSlider = document.getElementById('numberOfSpells');
+        const spellCountDisplay = document.getElementById('spellCountDisplay');
+        
+        spellCountSlider.addEventListener('input', function() {
+            spellCountDisplay.textContent = this.value;
+        });
+    </script>
 </body>
 </html>

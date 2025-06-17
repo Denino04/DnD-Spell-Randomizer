@@ -267,6 +267,102 @@
     </footer>
 
     <script src="spells.js"></script>
-    <script src="app.js"></script>
+    <script>
+        // Update spell count display when slider changes
+        document.getElementById('numberOfSpells').addEventListener('input', function() {
+            document.getElementById('spellCountDisplay').textContent = this.value;
+        });
+    
+        // Function to get selected schools
+        function getSelectedSchools() {
+            const checkboxes = document.querySelectorAll('input[name="school"]:checked');
+            return Array.from(checkboxes).map(cb => cb.value.toLowerCase());
+        }
+    
+        // Main function to generate spells
+        function fetchSpells() {
+            const characterClass = document.getElementById('characterClass').value;
+            const classLevel = parseInt(document.getElementById('classLevel').value);
+            const numberOfSpells = parseInt(document.getElementById('numberOfSpells').value);
+            const schools = getSelectedSchools();
+    
+            if (!characterClass) {
+                alert("Please select a character class");
+                return;
+            }
+    
+            if (isNaN(classLevel) || classLevel < 1 || classLevel > 20) {
+                alert("Please enter a valid character level (1-20)");
+                return;
+            }
+    
+            // Filter spells by class and level
+            let availableSpells = spells
+                .map(spell => {
+                    let levelStr = String(spell.Level).trim().toLowerCase();
+                    let parsedLevel = levelStr === 'cantrip' ? 0 : parseInt(levelStr) || 0;
+                    return { ...spell, ParsedLevel: parsedLevel };
+                })
+                .filter(spell => 
+                    spell.ParsedLevel <= classLevel && 
+                    spell.Class.toLowerCase().includes(characterClass.toLowerCase())
+                );
+    
+            // Filter by selected schools if any are selected
+            if (schools.length > 0) {
+                availableSpells = availableSpells.filter(spell => 
+                    schools.includes(spell.School.toLowerCase())
+                );
+            }
+    
+            if (availableSpells.length === 0) {
+                displayResults([]);
+                return;
+            }
+    
+            // Select random spells
+            let selectedSpells = [];
+            for (let i = 0; i < Math.min(numberOfSpells, availableSpells.length); i++) {
+                const randomIndex = Math.floor(Math.random() * availableSpells.length);
+                selectedSpells.push(availableSpells[randomIndex]);
+                // Remove selected spell to avoid duplicates
+                availableSpells.splice(randomIndex, 1);
+            }
+    
+            displayResults(selectedSpells);
+        }
+    
+        function displayResults(spells) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '';
+    
+            if (spells.length === 0) {
+                resultsDiv.innerHTML = `
+                    <div class="col-span-1 md:col-span-2 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                        No spells found matching your criteria. Try adjusting your filters.
+                    </div>
+                `;
+                return;
+            }
+    
+            spells.forEach((spell, index) => {
+                const schoolClass = `school-${spell.School.toLowerCase().replace(' ', '-')}`;
+                
+                const spellCard = document.createElement('div');
+                spellCard.className = `spell-card ${schoolClass} p-6 rounded-xl shadow-md`;
+                spellCard.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-xl font-bold">${spell['Spell Name']}</h3>
+                        <span class="bg-white bg-opacity-30 px-2 py-1 rounded">${spell.Level}</span>
+                    </div>
+                    <p class="mb-2"><strong>School:</strong> ${spell.School}</p>
+                    <p class="mb-2"><strong>Classes:</strong> ${spell.Class}</p>
+                    ${spell.Description ? `<p class="mt-3">${spell.Description}</p>` : ''}
+                `;
+                
+                resultsDiv.appendChild(spellCard);
+            });
+        }
+    </script>
 </body>
 </html>

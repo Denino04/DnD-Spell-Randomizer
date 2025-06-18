@@ -88,14 +88,16 @@
                                     <option value="paladin">Paladin</option>
                                     <option value="ranger">Ranger</option>
                                     <option value="artificer">Artificer</option>
+                                    <option value="ranger">Eldritch Knight</option>
+                                    <option value="artificer">Arcane Trickster</option>
                                 </select>
                             </div>
                             
                             <div>
-                                <label for="classLevel" class="block text-lg font-medium text-gray-700 mb-2">Character Level</label>
+                                <label for="classLevel" class="block text-lg font-medium text-gray-700 mb-2">Spell Level Level</label>
                                 <input type="number" id="classLevel" min="1" max="20" 
                                        class="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-purple-500" 
-                                       placeholder="1-20" required>
+                                       placeholder="0-9" required>
                             </div>
                         </div>
                         
@@ -280,21 +282,21 @@
         // Main function to generate spells
         function fetchSpells() {
             const characterClass = document.getElementById('characterClass').value;
-            const classLevel = parseInt(document.getElementById('classLevel').value);
+            const spellLevel = parseInt(document.getElementById('spellLevel').value); // Changed from classLevel to spellLevel
             const numberOfSpells = parseInt(document.getElementById('numberOfSpells').value);
             const schools = getSelectedSchools();
-    
+        
             if (!characterClass) {
                 alert("Please select a character class");
                 return;
             }
-    
-            if (isNaN(classLevel) || classLevel < 1 || classLevel > 20) {
-                alert("Please enter a valid character level (1-20)");
+        
+            if (isNaN(spellLevel) || spellLevel < 0 || spellLevel > 9) {
+                alert("Please enter a valid spell level (0-9, where 0 is cantrip)");
                 return;
             }
-    
-            // Filter spells by class and level
+        
+            // Filter spells by class and exact spell level
             let availableSpells = spells
                 .map(spell => {
                     let levelStr = String(spell.Level).trim().toLowerCase();
@@ -302,22 +304,22 @@
                     return { ...spell, ParsedLevel: parsedLevel };
                 })
                 .filter(spell => 
-                    spell.ParsedLevel <= classLevel && 
+                    spell.ParsedLevel === spellLevel && // Exact match to spell level now
                     spell.Class.toLowerCase().includes(characterClass.toLowerCase())
                 );
-    
+        
             // Filter by selected schools if any are selected
             if (schools.length > 0) {
                 availableSpells = availableSpells.filter(spell => 
                     schools.includes(spell.School.toLowerCase())
                 );
             }
-    
+        
             if (availableSpells.length === 0) {
                 displayResults([]);
                 return;
             }
-    
+        
             // Select random spells
             let selectedSpells = [];
             for (let i = 0; i < Math.min(numberOfSpells, availableSpells.length); i++) {
@@ -326,7 +328,7 @@
                 // Remove selected spell to avoid duplicates
                 availableSpells.splice(randomIndex, 1);
             }
-    
+        
             displayResults(selectedSpells);
         }
     

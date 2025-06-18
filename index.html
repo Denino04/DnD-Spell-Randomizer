@@ -66,7 +66,7 @@
     <!-- Main Content -->
     <main class="container mx-auto px-4 py-12">
         <!-- Generator Section -->
-        <section id="generator" class="mb-20 flex justify-center">
+        <section id="generator" class="mb-20">
             <div class="max-w-3xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
                 <div class="bg-gray-800 text-white px-6 py-4">
                     <h2 class="text-2xl font-bold"><i class="fas fa-magic mr-2"></i> Spell Generator</h2>
@@ -159,7 +159,7 @@
                 </div>
             </div>
             
-            <div id="results" class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto">
+            <div id="results" class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6"></div>
         </section>
         
         <!-- How It Works Section -->
@@ -267,7 +267,7 @@
     </footer>
 
     <script src="spells.js"></script>
-    <script>Add commentMore actions
+    <script>
         // Update spell count display when slider changes
         document.getElementById('numberOfSpells').addEventListener('input', function() {
             document.getElementById('spellCountDisplay').textContent = this.value;
@@ -364,6 +364,5 @@
             });
         }
     </script>
-
 </body>
 </html>

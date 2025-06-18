@@ -268,9 +268,43 @@
 
     <script src="spells.js"></script>
     <script>
-        // Ensure spells data is available
-        let spells = []; // This should be populated from spells.js
-        
+        // Sample spell data - in a real app this would be in spells.js
+        const spells = [
+            {
+                "Spell Name": "Magic Missile",
+                "Level": "1",
+                "School": "Evocation",
+                "Class": "Wizard, Sorcerer",
+                "Casting Time": "1 action",
+                "Range": "120 feet",
+                "Components": "V, S",
+                "Duration": "Instantaneous",
+                "Description": "You create three glowing darts of magical force..."
+            },
+            {
+                "Spell Name": "Cure Wounds",
+                "Level": "1",
+                "School": "Evocation",
+                "Class": "Cleric, Druid, Paladin, Ranger",
+                "Casting Time": "1 action",
+                "Range": "Touch",
+                "Components": "V, S",
+                "Duration": "Instantaneous",
+                "Description": "A creature you touch regains hit points..."
+            },
+            {
+                "Spell Name": "Fireball",
+                "Level": "3",
+                "School": "Evocation",
+                "Class": "Wizard, Sorcerer",
+                "Casting Time": "1 action",
+                "Range": "150 feet",
+                "Components": "V, S, M",
+                "Duration": "Instantaneous",
+                "Description": "A bright streak flashes from your pointing finger..."
+            }
+        ];
+    
         // Update spell count display when slider changes
         document.getElementById('numberOfSpells').addEventListener('input', function() {
             document.getElementById('spellCountDisplay').textContent = this.value;
@@ -285,7 +319,7 @@
         // Main function to generate spells
         function fetchSpells() {
             const characterClass = document.getElementById('characterClass').value;
-            const classLevel = parseInt(document.getElementById('classLevel').value); // Changed from spellLevel
+            const classLevel = parseInt(document.getElementById('classLevel').value);
             const numberOfSpells = parseInt(document.getElementById('numberOfSpells').value);
             const schools = getSelectedSchools();
     
@@ -307,7 +341,7 @@
                     return { ...spell, ParsedLevel: parsedLevel };
                 })
                 .filter(spell => 
-                    spell.ParsedLevel === classLevel && // Changed to use classLevel
+                    spell.ParsedLevel === classLevel && 
                     spell.Class.toLowerCase().includes(characterClass.toLowerCase())
                 );
     
@@ -325,7 +359,9 @@
     
             // Select random spells
             let selectedSpells = [];
-            for (let i = 0; i < Math.min(numberOfSpells, availableSpells.length); i++) {
+            const spellsToSelect = Math.min(numberOfSpells, availableSpells.length);
+            
+            for (let i = 0; i < spellsToSelect; i++) {
                 const randomIndex = Math.floor(Math.random() * availableSpells.length);
                 selectedSpells.push(availableSpells[randomIndex]);
                 availableSpells.splice(randomIndex, 1);
@@ -370,25 +406,6 @@
                 
                 resultsDiv.appendChild(spellCard);
             });
-        }
-    
-        // Initialize with sample data if spells.js fails
-        if (typeof spells === 'undefined' || spells.length === 0) {
-            spells = [
-                {
-                    "Spell Name": "Magic Missile",
-                    "Level": "1",
-                    "School": "Evocation",
-                    "Class": "Wizard, Sorcerer",
-                    "Casting Time": "1 action",
-                    "Range": "120 feet",
-                    "Components": "V, S",
-                    "Duration": "Instantaneous",
-                    "Description": "You create three glowing darts of magical force..."
-                },
-                // Add more sample spells as needed
-            ];
-            console.warn("Using sample spell data - spells.js not loaded properly");
         }
     </script>
 

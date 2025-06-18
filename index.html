@@ -267,44 +267,7 @@
     </footer>
 
     <script src="spells.js"></script>
-    <script>
-        // Sample spell data - in a real app this would be in spells.js
-        const spells = [
-            {
-                "Spell Name": "Magic Missile",
-                "Level": "1",
-                "School": "Evocation",
-                "Class": "Wizard, Sorcerer",
-                "Casting Time": "1 action",
-                "Range": "120 feet",
-                "Components": "V, S",
-                "Duration": "Instantaneous",
-                "Description": "You create three glowing darts of magical force..."
-            },
-            {
-                "Spell Name": "Cure Wounds",
-                "Level": "1",
-                "School": "Evocation",
-                "Class": "Cleric, Druid, Paladin, Ranger",
-                "Casting Time": "1 action",
-                "Range": "Touch",
-                "Components": "V, S",
-                "Duration": "Instantaneous",
-                "Description": "A creature you touch regains hit points..."
-            },
-            {
-                "Spell Name": "Fireball",
-                "Level": "3",
-                "School": "Evocation",
-                "Class": "Wizard, Sorcerer",
-                "Casting Time": "1 action",
-                "Range": "150 feet",
-                "Components": "V, S, M",
-                "Duration": "Instantaneous",
-                "Description": "A bright streak flashes from your pointing finger..."
-            }
-        ];
-    
+    <script>Add commentMore actions
         // Update spell count display when slider changes
         document.getElementById('numberOfSpells').addEventListener('input', function() {
             document.getElementById('spellCountDisplay').textContent = this.value;
@@ -328,8 +291,8 @@
                 return;
             }
     
-            if (isNaN(classLevel) || classLevel < 0 || classLevel > 9) {
-                alert("Please enter a valid spell level (0-9)");
+            if (isNaN(classLevel) || classLevel < 1 || classLevel > 20) {
+                alert("Please enter a valid character level (1-20)");
                 return;
             }
     
@@ -341,7 +304,7 @@
                     return { ...spell, ParsedLevel: parsedLevel };
                 })
                 .filter(spell => 
-                    spell.ParsedLevel === classLevel && 
+                    spell.ParsedLevel <= classLevel && 
                     spell.Class.toLowerCase().includes(characterClass.toLowerCase())
                 );
     
@@ -359,11 +322,10 @@
     
             // Select random spells
             let selectedSpells = [];
-            const spellsToSelect = Math.min(numberOfSpells, availableSpells.length);
-            
-            for (let i = 0; i < spellsToSelect; i++) {
+            for (let i = 0; i < Math.min(numberOfSpells, availableSpells.length); i++) {
                 const randomIndex = Math.floor(Math.random() * availableSpells.length);
                 selectedSpells.push(availableSpells[randomIndex]);
+                // Remove selected spell to avoid duplicates
                 availableSpells.splice(randomIndex, 1);
             }
     
@@ -393,15 +355,9 @@
                         <h3 class="text-xl font-bold">${spell['Spell Name']}</h3>
                         <span class="bg-white bg-opacity-30 px-2 py-1 rounded">${spell.Level}</span>
                     </div>
-                    <div class="grid grid-cols-2 gap-2 mb-3">
-                        <p><strong>School:</strong> ${spell.School}</p>
-                        <p><strong>Classes:</strong> ${spell.Class}</p>
-                        <p><strong>Casting Time:</strong> ${spell['Casting Time'] || 'N/A'}</p>
-                        <p><strong>Range:</strong> ${spell.Range || 'N/A'}</p>
-                        <p><strong>Duration:</strong> ${spell.Duration || 'N/A'}</p>
-                        <p><strong>Components:</strong> ${spell.Components || 'N/A'}</p>
-                    </div>
-                    ${spell.Description ? `<div class="mt-3 p-3 bg-white bg-opacity-30 rounded"><p>${spell.Description}</p></div>` : ''}
+                    <p class="mb-2"><strong>School:</strong> ${spell.School}</p>
+                    <p class="mb-2"><strong>Classes:</strong> ${spell.Class}</p>
+                    ${spell.Description ? `<p class="mt-3">${spell.Description}</p>` : ''}
                 `;
                 
                 resultsDiv.appendChild(spellCard);
